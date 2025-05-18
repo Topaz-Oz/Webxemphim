@@ -17,44 +17,25 @@ import { useAuth } from '../contexts/AuthContext';
 import { movieApi } from '../api';
 import { useState } from 'react';
 
-interface MovieCardProps {
-  _id: string;
-  title: string;
-  thumbnail: string;
-  slug: string;
-  year?: number;
-  isFavorite?: boolean;
-  onFavoriteChange?: (id: string, isFavorite: boolean) => void;
-}
+import type { MovieCardProps } from './types';
 
-export default function MovieCard({ 
-  _id,
-  title, 
-  thumbnail, 
-  slug, 
-  year,
-  isFavorite = false,
-  onFavoriteChange
-}: MovieCardProps) {
+export default function MovieCard({ movie, isFavorite = false, onFavoriteClick }: MovieCardProps) {
   const { isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [favorite, setFavorite] = useState(isFavorite);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigation
+    e.preventDefault();
     if (!isAuthenticated || isLoading) return;
-
     setIsLoading(true);
     try {
       if (favorite) {
-        await movieApi.removeFromFavorites(_id);
+        await movieApi.removeFromFavorites(movie._id);
       } else {
-        await movieApi.addToFavorites(_id);
+        await movieApi.addToFavorites(movie._id);
       }
       setFavorite(!favorite);
-      if (onFavoriteChange) {
-        onFavoriteChange(_id, !favorite);
-      }
+      if (onFavoriteClick) onFavoriteClick();
     } catch (error) {
       console.error('Error updating favorite:', error);
     } finally {
@@ -65,12 +46,12 @@ export default function MovieCard({
   return (
     <Card>
       <Box sx={{ position: 'relative' }}>
-        <CardActionArea component={RouterLink} to={`/movie/${slug}`}>
+        <CardActionArea component={RouterLink} to={`/movie/${movie.slug}`}>
           <CardMedia
             component="img"
             height="300"
-            image={thumbnail}
-            alt={title}
+            image={movie.thumbnail}
+            alt={movie.title}
             sx={{ objectFit: 'cover' }}
           />
         </CardActionArea>
@@ -98,13 +79,11 @@ export default function MovieCard({
       </Box>
       <CardContent>
         <Typography gutterBottom variant="h6" component="div" noWrap>
-          {title}
+          {movie.title}
         </Typography>
-        {year && (
-          <Typography variant="body2" color="text.secondary">
-            Năm: {year}
-          </Typography>
-        )}
+        <Typography variant="body2" color="text.secondary" noWrap>
+          {movie.year}
+        </Typography>
       </CardContent>
     </Card>
   );

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { authApi } from '../api';
 
@@ -24,10 +25,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const token = searchParams.get('token');
+    
+    if (location.pathname === '/auth/callback' && token) {
+      localStorage.setItem('token', token);
+      checkAuth();
+      navigate('/');
+    }
+  }, [location, navigate]);
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');

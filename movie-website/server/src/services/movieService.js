@@ -98,23 +98,38 @@ class MovieService {
     }
   }
 
-  async getSimilarMovies(movieId, limit = 10) {
-    try {
-      const movie = await Movie.findById(movieId);
-      if (!movie) throw new Error('Movie not found');
+  async getVideoStream(movieId) {
+    const movie = await Movie.findById(movieId);
+    if (!movie) throw new Error('Movie not found');
 
-      const similarMovies = await Movie.find({
-        genres: { $in: movie.genres },
-        _id: { $ne: movieId }
-      })
-        .limit(limit)
-        .select('title thumbnail slug');
-
-      return similarMovies;
-    } catch (error) {
-      console.error('Error getting similar movies:', error);
-      throw error;
+    // Fetch video source from rophim.me
+    const response = await axios.get(movie.url);
+    const $ = cheerio.load(response.data);
+    
+    // Extract video source URL (this will need to be adapted based on rophim.me's structure)
+    const videoSrc = $('.video-player iframe').attr('src');
+    
+    if (!videoSrc) {
+      throw new Error('Video source not found');
     }
+
+    return {
+      url: videoSrc,
+      quality: 'auto',
+      type: 'application/x-mpegURL' // assuming HLS stream
+    };
+  }
+
+  async getSimilarMovies(movieId, limit = 6) {
+    const movie = await Movie.findById(movieId);
+    if (!movie) return [];
+
+    return Movie.find({
+      _id: { $ne: movieId },
+      genres: { $in: movie.genres }
+    })
+    .limit(limit)
+    .select('title thumbnail slug year genres');
   }
 }
 

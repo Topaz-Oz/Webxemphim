@@ -1,6 +1,7 @@
 const Movie = require('../models/Movie');
 const User = require('../models/User');
 const movieService = require('../services/movieService');
+const recommendationService = require('../services/recommendationService');
 
 exports.getMovies = async (req, res) => {
   try {
@@ -116,6 +117,50 @@ exports.getFavorites = async (req, res) => {
       });
 
     res.json(user.favorites);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getRecommendedMovies = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const contentBased = await recommendationService.getContentBasedRecommendations(req.query.movieId);
+    const collaborative = await recommendationService.getCollaborativeRecommendations(userId);
+
+    res.json({
+      contentBased,
+      collaborative
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.addToWatchHistory = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const movieId = req.params.movieId;
+
+    await User.findByIdAndUpdate(userId, {
+      $push: {
+        watchHistory: {
+          movie: movieId,
+          watchedAt: new Date()
+        }
+      }
+    });
+
+    res.json({ message: 'Added to watch history' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getVideoStream = async (req, res) => {
+  try {
+    const stream = await movieService.getVideoStream(req.params.movieId);
+    res.json(stream);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

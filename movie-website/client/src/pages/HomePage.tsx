@@ -106,13 +106,9 @@ export default function HomePage() {
         {paginatedMovies.movies.map((movie) => (
           <MovieCard
             key={movie._id}
-            _id={movie._id}
-            title={movie.title}
-            thumbnail={movie.thumbnail}
-            slug={movie.slug}
-            year={movie.year}
+            movie={movie}
             isFavorite={favorites.has(movie._id)}
-            onFavoriteChange={handleFavoriteChange}
+            onFavoriteClick={() => handleFavoriteChange(movie._id, !favorites.has(movie._id))}
           />
         ))}
       </Box>

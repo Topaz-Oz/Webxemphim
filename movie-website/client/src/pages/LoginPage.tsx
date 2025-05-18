@@ -8,7 +8,9 @@ import {
   Paper,
   Link,
   Alert,
+  Divider,
 } from '@mui/material';
+import { Google as GoogleIcon } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
@@ -32,6 +34,10 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   };
 
   return (
@@ -92,6 +98,18 @@ export default function LoginPage() {
             sx={{ mt: 3, mb: 2 }}
           >
             {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          </Button>
+
+          <Divider sx={{ my: 2 }}>HOẶC</Divider>
+
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<GoogleIcon />}
+            onClick={handleGoogleLogin}
+            sx={{ mb: 2 }}
+          >
+            Đăng nhập bằng Google
           </Button>
 
           <Typography align="center">

@@ -12,19 +12,17 @@ import { useNavigate } from 'react-router-dom';
 import { movieApi } from '../api';
 import { useDebounce } from '../hooks/useDebounce';
 
-interface Movie {
+interface SearchMovie {
   _id: string;
   title: string;
-  thumbnail: string;
   slug: string;
   year: number;
 }
 
 export default function SearchBar() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [options, setOptions] = useState<Movie[]>([]);
+  const [options, setOptions] = useState<SearchMovie[]>([]);
   const [loading, setLoading] = useState(false);
   
   const debouncedSearch = useDebounce(inputValue, 300);
@@ -42,6 +40,7 @@ export default function SearchBar() {
         setOptions(data);
       } catch (error) {
         console.error('Error searching movies:', error);
+        setOptions([]);
       } finally {
         setLoading(false);
       }
@@ -51,24 +50,22 @@ export default function SearchBar() {
   }, [debouncedSearch]);
 
   return (
-    <Autocomplete<Movie>
-      id="movie-search"
-      sx={{ width: 300 }}
-      open={open}
-      onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
-      isOptionEqualToValue={(option, value) => option._id === value._id}
-      filterOptions={(x) => x}
+    <Autocomplete
       options={options}
+      getOptionLabel={(option: SearchMovie) => option.title}
       loading={loading}
-      getOptionLabel={(option) => option.title}
+      inputValue={inputValue}
+      onInputChange={(_, newValue) => setInputValue(newValue)}
       onChange={(_, movie) => {
         if (movie) {
           navigate(`/movie/${movie.slug}`);
         }
       }}
-      onInputChange={(_, value) => setInputValue(value)}
-      noOptionsText="Không tìm thấy phim"
+      noOptionsText={
+        <Typography color="text.secondary">
+          {inputValue ? 'Không tìm thấy phim phù hợp' : 'Nhập tên phim để tìm kiếm'}
+        </Typography>
+      }
       renderInput={(params) => (
         <TextField
           {...params}
@@ -87,24 +84,23 @@ export default function SearchBar() {
               </>
             ),
           }}
+          sx={{
+            width: { xs: '100%', sm: 300, md: 400 },
+            '& .MuiInputBase-root': {
+              borderRadius: 20,
+              bgcolor: 'background.paper',
+              '&:hover': {
+                bgcolor: 'action.hover',
+              },
+            },
+          }}
         />
       )}
-      renderOption={(props, movie) => (
+      renderOption={(props, option: SearchMovie) => (
         <Box component="li" {...props}>
-          <Box sx={{ display: 'flex', alignItems: 'center', p: 1 }}>
-            <Box
-              component="img"
-              sx={{ width: 50, height: 70, mr: 2, objectFit: 'cover' }}
-              src={movie.thumbnail}
-              alt={movie.title}
-            />
-            <Box>
-              <Typography variant="body1">{movie.title}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                {movie.year}
-              </Typography>
-            </Box>
-          </Box>
+          <Typography>
+            {option.title} ({option.year})
+          </Typography>
         </Box>
       )}
     />

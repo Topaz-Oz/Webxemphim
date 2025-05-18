@@ -52,6 +52,18 @@ export interface AdminMovie extends Movie {
   updatedAt: string;
 }
 
+export interface VideoStream {
+  url: string;
+  quality: string;
+  type: string;
+}
+
+export interface Recommendations {
+  contentBased: Movie[];
+  collaborative: Movie[];
+}
+
+// Movie APIs
 export const movieApi = {
   // Public endpoints
   getMovies: (page = 1, limit = 20) => 
@@ -74,6 +86,22 @@ export const movieApi = {
     api.post('/movies/sync'),
   deleteMovie: (movieId: string) => 
     api.delete(`/movies/${movieId}`),
+
+  // New endpoints
+  getRecommendations: async (movieId?: string): Promise<Recommendations> => {
+    const params = movieId ? { movieId } : {};
+    const response = await api.get('/movies/recommendations', { params });
+    return response.data;
+  },
+
+  getVideoStream: async (movieId: string): Promise<VideoStream> => {
+    const response = await api.get(`/movies/${movieId}/stream`);
+    return response.data;
+  },
+
+  addToWatchHistory: async (movieId: string): Promise<void> => {
+    await api.post(`/movies/watch-history/${movieId}`);
+  },
 };
 
 export const authApi = {

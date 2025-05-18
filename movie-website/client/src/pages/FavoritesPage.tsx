@@ -81,13 +81,9 @@ export default function FavoritesPage() {
             {favorites.map((movie) => (
               <MovieCard
                 key={movie._id}
-                _id={movie._id}
-                title={movie.title}
-                thumbnail={movie.thumbnail}
-                slug={movie.slug}
-                year={movie.year}
+                movie={movie}
                 isFavorite={true}
-                onFavoriteChange={handleFavoriteChange}
+                onFavoriteClick={() => handleFavoriteChange(movie._id, false)}
               />
             ))}
           </Box>
