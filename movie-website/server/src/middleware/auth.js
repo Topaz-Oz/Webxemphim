@@ -27,3 +27,12 @@ exports.admin = (req, res, next) => {
     res.status(401).json({ message: 'Not authorized as admin' });
   }
 };
+
+exports.checkRole = function(role) {
+  return (req, res, next) => {
+    if (req.user && req.user.role === role) {
+      return next();
+    }
+    return res.status(403).json({ message: 'Forbidden: Insufficient role' });
+  };
+};

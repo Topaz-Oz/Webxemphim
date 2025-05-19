@@ -14,9 +14,15 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  }  return config;
 });
+
+// Common response type for API calls
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  error?: string;
+}
 
 export interface MovieListResponse {
   movies: Movie[];
@@ -64,10 +70,11 @@ export interface Recommendations {
 }
 
 // Movie APIs
-export const movieApi = {
-  // Public endpoints
-  getMovies: (page = 1, limit = 20) => 
-    api.get<MovieListResponse>(`/movies?page=${page}&limit=${limit}`),
+export const movieApi = {  // Public endpoints
+  getMovies: (page = 1, limit = 20, category?: string) => 
+    api.get<MovieListResponse>(`/movies?page=${page}&limit=${limit}${category ? `&category=${category}` : ''}`),
+  getFeaturedMovies: () => 
+    api.get<ApiResponse<Movie[]>>('/movies/featured'),
   getMovie: (slug: string) => 
     api.get<{ movie: MovieDetail, similarMovies: Movie[] }>(`/movies/${slug}`),
   searchMovies: (query: string) => 

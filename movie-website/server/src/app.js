@@ -5,6 +5,7 @@ const passport = require('passport');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Session middleware
+// Session middleware 
 app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
@@ -34,11 +35,16 @@ app.use(passport.session());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
+app.use('/api/admin', adminRoutes);
 
-// Serve static files in production
+// Serve static files in production và bắt tất cả route cho React Router
 if (process.env.NODE_ENV === 'production') {
+  // Phục vụ folder build của React
   app.use(express.static(path.join(__dirname, '../public')));
-  app.get('*', (req, res) => {
+
+  // Bắt mọi đường dẫn chưa match API để trả về index.html
+  // Dùng named wildcard 'splat' theo cú pháp Express 5
+  app.get('/*splat', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'index.html'));
   });
 }

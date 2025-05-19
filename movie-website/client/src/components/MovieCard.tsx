@@ -1,11 +1,13 @@
 import { 
   Card, 
-  CardContent, 
   CardMedia, 
+  CardContent, 
   Typography, 
-  CardActionArea,
-  IconButton,
+  IconButton, 
   Box,
+  Chip,
+  Rating,
+  CardActionArea,
   Tooltip
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
@@ -19,23 +21,21 @@ import { useState } from 'react';
 
 import type { MovieCardProps } from './types';
 
-export default function MovieCard({ movie, isFavorite = false, onFavoriteClick }: MovieCardProps) {
+export default function MovieCard({ movie, isFavorite = false, onToggleFavorite }: MovieCardProps) {
   const { isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [favorite, setFavorite] = useState(isFavorite);
-
+  const [isHovered, setIsHovered] = useState(false);
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isAuthenticated || isLoading) return;
     setIsLoading(true);
     try {
-      if (favorite) {
+      if (isFavorite) {
         await movieApi.removeFromFavorites(movie._id);
       } else {
         await movieApi.addToFavorites(movie._id);
       }
-      setFavorite(!favorite);
-      if (onFavoriteClick) onFavoriteClick();
+      if (onToggleFavorite) onToggleFavorite();
     } catch (error) {
       console.error('Error updating favorite:', error);
     } finally {
@@ -66,9 +66,8 @@ export default function MovieCard({ movie, isFavorite = false, onFavoriteClick }
             }}
             onClick={handleFavoriteClick}
             disabled={isLoading}
-          >
-            <Tooltip title={favorite ? "Xóa khỏi danh sách yêu thích" : "Thêm vào yêu thích"}>
-              {favorite ? (
+          >            <Tooltip title={isFavorite ? "Xóa khỏi danh sách yêu thích" : "Thêm vào yêu thích"}>
+              {isFavorite ? (
                 <FavoriteIcon color="error" />
               ) : (
                 <FavoriteBorderIcon />

@@ -24,7 +24,7 @@ interface MovieSliderProps {
 }
 
 export default function MovieSlider({ 
-  movies, 
+  movies = [],
   autoPlay = true, 
   interval = 5000 
 }: MovieSliderProps) {
@@ -32,15 +32,16 @@ export default function MovieSlider({
   const theme = useTheme();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!autoPlay) return;
+ useEffect(() => {
+  if (!autoPlay || !movies || movies.length === 0) return;
 
-    const timer = setInterval(() => {
-      handleNext();
-    }, interval);
+  const timer = setInterval(() => {
+    setCurrentIndex(prev => (prev === movies.length - 1 ? 0 : prev + 1));
+  }, interval);
 
-    return () => clearInterval(timer);
-  }, [autoPlay, interval, currentIndex]);
+  return () => clearInterval(timer);
+}, [autoPlay, interval, movies]);
+
 
   const handlePrevious = () => {
     setCurrentIndex((prev) => (prev === 0 ? movies.length - 1 : prev - 1));
@@ -50,7 +51,8 @@ export default function MovieSlider({
     setCurrentIndex((prev) => (prev === movies.length - 1 ? 0 : prev + 1));
   };
 
-  if (!movies.length) return null;
+  if (!Array.isArray(movies) || movies.length === 0) return null;
+
 
   const currentMovie = movies[currentIndex];
 
@@ -141,6 +143,7 @@ export default function MovieSlider({
 
       {/* Navigation Arrows */}
       <IconButton
+        aria-label="Previous movie"
         onClick={handlePrevious}
         sx={{
           position: 'absolute',
@@ -158,6 +161,7 @@ export default function MovieSlider({
       </IconButton>
 
       <IconButton
+        aria-label="Next movie"
         onClick={handleNext}
         sx={{
           position: 'absolute',

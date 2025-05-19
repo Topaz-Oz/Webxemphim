@@ -37,8 +37,9 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+  window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   };
+
 
   return (
     <Box
@@ -111,13 +112,6 @@ export default function LoginPage() {
           >
             Đăng nhập bằng Google
           </Button>
-
-          <Typography align="center">
-            Chưa có tài khoản?{' '}
-            <Link component={RouterLink} to="/register">
-              Đăng ký ngay
-            </Link>
-          </Typography>
         </Box>
       </Paper>
     </Box>

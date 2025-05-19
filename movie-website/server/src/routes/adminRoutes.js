@@ -16,7 +16,6 @@ router.post('/sync', checkRole('admin'), async (req, res) => {
 
 // Get sync status
 router.get('/sync/status', checkRole('admin'), async (req, res) => {
-  // TODO: Implement sync status tracking
   res.json({ status: 'idle' });
 });
 

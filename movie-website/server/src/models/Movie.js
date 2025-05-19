@@ -6,6 +6,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
     index: true,
   },
+  originalTitle: String,
   slug: {
     type: String,
     required: true,
@@ -15,6 +16,23 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: true,
     index: true,
+  },
+  type: {
+    type: String,
+    enum: ['single', 'series'],
+    required: true,
+    default: 'single',
+    index: true,
+  },
+  isTheater: {
+    type: Boolean,
+    default: false,
+    index: true,
+  },
+  quality: {
+    type: String,
+    enum: ['HD', 'SD', 'CAM', 'FHD'],
+    default: 'HD',
   },
   genres: [{
     type: String,

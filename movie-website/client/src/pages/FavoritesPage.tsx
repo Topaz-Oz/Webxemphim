@@ -79,13 +79,14 @@ export default function FavoritesPage() {
             }
           }}>
             {favorites.map((movie) => (
-              <MovieCard
-                key={movie._id}
-                movie={movie}
-                isFavorite={true}
-                onFavoriteClick={() => handleFavoriteChange(movie._id, false)}
-              />
-            ))}
+  <MovieCard
+    key={movie._id}
+    movie={movie}
+    isFavorite={true}
+    onToggleFavorite={() => handleFavoriteChange(movie._id, false)}
+  />
+))}
+
           </Box>
         </>
       )}

@@ -34,7 +34,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(formData.username, formData.email, formData.password);
-      navigate('/');
+      navigate('/admin');
     } catch (err) {
       setError('Đăng ký thất bại. Vui lòng thử lại.');
     } finally {
@@ -68,7 +68,7 @@ export default function RegisterPage() {
         }}
       >
         <Typography variant="h5" component="h1" gutterBottom align="center">
-          Đăng ký tài khoản
+          Đăng ký tài khoản Admin
         </Typography>
 
         {error && (
@@ -134,13 +134,6 @@ export default function RegisterPage() {
           >
             {loading ? 'Đang đăng ký...' : 'Đăng ký'}
           </Button>
-
-          <Typography align="center">
-            Đã có tài khoản?{' '}
-            <Link component={RouterLink} to="/login">
-              Đăng nhập
-            </Link>
-          </Typography>
         </Box>
       </Paper>
     </Box>

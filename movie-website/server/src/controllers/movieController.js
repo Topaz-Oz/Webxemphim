@@ -7,15 +7,34 @@ exports.getMovies = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
+    const category = req.query.category;
     const skip = (page - 1) * limit;
 
-    const movies = await Movie.find()
+    let query = {};
+    
+    // Filter by category
+    switch (category) {
+      case 'series':
+        query.type = 'series';
+        break;
+      case 'single':
+        query.type = 'single';
+        break;
+      case 'theater':
+        query.isTheater = true;
+        break;
+      case 'new':
+        // No additional query needed, will sort by date
+        break;
+    }
+
+    const movies = await Movie.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select('title thumbnail slug year genres');
+      .select('title thumbnail slug year genres quality rating');
 
-    const total = await Movie.countDocuments();
+    const total = await Movie.countDocuments(query);
 
     res.json({
       movies,
@@ -161,6 +180,23 @@ exports.getVideoStream = async (req, res) => {
   try {
     const stream = await movieService.getVideoStream(req.params.movieId);
     res.json(stream);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getFeaturedMovies = async (req, res) => {
+  try {
+    // Get movies with highest ratings and views
+    const featuredMovies = await Movie.find({
+      rating: { $gt: 7 },  // Movies with rating > 7
+      views: { $gt: 100 }  // Movies with more than 100 views
+    })
+    .sort({ rating: -1, views: -1 })
+    .limit(10)
+    .select('title thumbnail slug year genres quality rating');
+
+    res.json(featuredMovies);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

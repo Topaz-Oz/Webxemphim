@@ -26,16 +26,18 @@ class CrawlerService {
       // Get movie items from the grid
       $('.film-item').each((i, element) => {
         try {
-          const $el = $(element);
-          const title = $el.find('.film-title').text().trim();
+          const $el = $(element);          const title = $el.find('.film-title').text().trim();
           const url = $el.find('a').first().attr('href');
           const slug = url?.split('/').pop() || '';
           const thumbnail = $el.find('img').first().attr('src') || '';
           const quality = $el.find('.film-quality').text().trim();
           const meta = $el.find('.film-meta').text().trim();
           const rating = parseFloat($el.find('.film-rating').text()) || 0;
-
-          if (title && url) {
+          
+          // Extract additional information
+          const type = meta.includes('Tập') ? 'series' : 'single';
+          const isTheater = meta.includes('Chiếu Rạp');
+          const year = parseInt(meta.match(/\d{4}/) ? meta.match(/\d{4}/)[0] : new Date().getFullYear());          if (title && url) {
             movies.push({
               title,
               slug,
@@ -43,6 +45,9 @@ class CrawlerService {
               url: url.startsWith('http') ? url : `${this.baseUrl}${url}`,
               quality,
               rating,
+              type,
+              isTheater,
+              year,
               meta,
               updatedAt: new Date()
             });
